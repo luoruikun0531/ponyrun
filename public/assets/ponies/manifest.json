@@ -1,0 +1,48 @@
+{
+  "cellW": 290,
+  "cellH": 256,
+  "baseline": 253,
+  "ponies": [
+    "white",
+    "brown",
+    "gray",
+    "yellow"
+  ],
+  "anims": {
+    "idle": {
+      "frames": 4,
+      "fps": 4,
+      "loop": true
+    },
+    "run": {
+      "frames": 6,
+      "fps": 12,
+      "loop": true
+    },
+    "sprint": {
+      "frames": 6,
+      "fps": 18,
+      "loop": true
+    },
+    "trip": {
+      "frames": 6,
+      "fps": 14,
+      "loop": false
+    },
+    "cry": {
+      "frames": 4,
+      "fps": 6,
+      "loop": true
+    },
+    "taunt": {
+      "frames": 4,
+      "fps": 8,
+      "loop": true
+    },
+    "hit": {
+      "frames": 4,
+      "fps": 12,
+      "loop": false
+    }
+  }
+}

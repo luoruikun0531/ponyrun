@@ -1,0 +1,11 @@
+node_modules
+dist
+.DS_Store
+*.log
+.vite
+.venv_gen
+
+# Dev-time raw Gemini output (sliced frames live in public/assets, committed)
+assets_raw/
+.env
+.env.local
