@@ -3,7 +3,7 @@
 // subscribes to race events; the logic never knows about rendering (goal.md §6).
 // Effects/audio fire on events so adding an item needs no changes here.
 
-import { Container } from 'pixi.js';
+import { Container, Sprite } from 'pixi.js';
 import { Track } from './Track.js';
 import { PonyActor } from './PonyActor.js';
 import { ItemMeteor } from './ItemMeteor.js';
@@ -135,6 +135,7 @@ export class RaceView {
 
   _spawn() {
     const w = this.app.screen.width;
+    const h = this.app.screen.height;
     const type = rollItemType(this.race.rng, this.race.leader().x);
     const def = ITEMS[type];
     const n = this.actors.length;
@@ -142,12 +143,14 @@ export class RaceView {
     const iconSize = ph * (def.rarity === 'rare' ? 0.92 : 0.78);
 
     let lane = (Math.random() * n) | 0;
-    let from; let to;
-    if (type === 'missile') {
-      lane = this.race.leader().index;
-      const x = this.track.mapX(this.race.leader().x);
-      from = { x: x + 80, y: -60 };
-      to = { x, y: this.track.laneGroundY(lane) - ph * 0.5 };
+    let from; let to; let vertical = false;
+    if (def.fly === 'vertical') {
+      // falls across every lane; the target is whichever lane it's tapped over
+      vertical = true;
+      const x = w * (0.2 + Math.random() * 0.62);
+      const topDown = Math.random() < 0.5;
+      from = { x, y: topDown ? -60 : h + 60 };
+      to = { x, y: topDown ? h + 60 : -60 };
     } else if (type === 'hitchhike') {
       lane = this.race.last().index;
       const y = this.track.laneGroundY(lane) - ph * 0.55;
@@ -159,7 +162,7 @@ export class RaceView {
     }
 
     const meteor = new ItemMeteor(this.app, this.assets, type, {
-      from, to, flyTime: def.flyTime, laneIndex: lane, iconSize,
+      from, to, flyTime: def.flyTime, laneIndex: lane, iconSize, vertical,
       onCatch: (m) => this._onCatch(m),
       onMiss: () => {},
     });
@@ -172,7 +175,42 @@ export class RaceView {
     const rare = meteor.def.rarity === 'rare';
     if (rare) { sfx.catchRare(); this.effects.sparkle(x, y); }
     else { sfx.catchCommon(); this.effects.burst(x, y, { color: 0xfff0b0, count: 12, speed: 260 }); }
-    this.race.applyItem(meteor.type, { laneIndex: meteor.laneIndex });
+    const laneIndex = meteor.vertical ? this.track.laneAtY(y) : meteor.laneIndex;
+    if (meteor.type === 'missile') {
+      meteor.dead = true; // remove the pickup; a homing rocket flies to the target
+      this._launchMissile(x, y, laneIndex);
+    } else {
+      this.race.applyItem(meteor.type, { laneIndex });
+    }
+  }
+
+  // Caught missile: a rocket streaks to the targeted pony, then detonates.
+  _launchMissile(fromX, fromY, laneIndex) {
+    const target = this.actors[laneIndex];
+    const ph = this.track.ponyHeight();
+    const spr = new Sprite(this.assets.items.missile);
+    spr.anchor.set(0.5);
+    spr.scale.set((ph * 0.66) / Math.max(spr.texture.width, spr.texture.height));
+    spr.x = fromX; spr.y = fromY;
+    sfx.dash(); // launch whoosh
+    let hit = false; let t = 0;
+    this.effects.attach(spr, (dt) => {
+      if (hit) return false;
+      t += dt;
+      const tx = target.container.x;
+      const ty = target.container.y - ph * 0.5;
+      const dx = tx - spr.x; const dy = ty - spr.y;
+      const dist = Math.hypot(dx, dy) || 1;
+      spr.rotation = Math.atan2(dy, dx) + Math.PI / 4;
+      if (dist < ph * 0.34 || t > 1.3) {
+        hit = true;
+        this.race.applyItem('missile', { laneIndex }); // knockback + 'hit' → boom/sfx/anim
+        return false;
+      }
+      const step = Math.min(dist, 1100 * dt);
+      spr.x += (dx / dist) * step; spr.y += (dy / dist) * step;
+      return true;
+    });
   }
 
   // ── race events → show + sound ───────────────────────────────────────

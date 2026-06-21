@@ -58,7 +58,7 @@ export class UI {
   _onLang() {
     this._syncToggles();
     if (this._screen === 'start') this.showStart();
-    else if (this._screen === 'result' && this._lastResults) this.showResult(this._lastResults, this._lastDrinks);
+    else if (this._screen === 'result' && this._lastResults) this.showResult(this._lastResults);
   }
 
   hideAll() { clear(this.layer); this._screen = null; }
@@ -129,29 +129,35 @@ export class UI {
   }
 
   // ── Result ───────────────────────────────────────────────────────────
-  showResult(results, drinks) {
+  showResult(results) {
     this._screen = 'result';
-    this._lastResults = results; this._lastDrinks = drinks;
+    this._lastResults = results;
     clear(this.layer);
     this.topbar.style.display = 'flex';
-    const { order, loser } = results;
+    const { order, winner, loser } = results;
+    // every pony owes 1 cup; the winner is exempt; items adjust the rest
+    const drinksOf = (p) => (p === winner ? 0 : Math.max(1, p.penalty));
 
-    const loserName = this._nameOf(loser);
     const loserCard = el('div', { class: 'loser-reveal' }, [
       this.thumb(loser.colorKey, 'cry', 130),
       el('div', { class: 'loser-text' }, [
         el('div', { class: 'loser-label' }, '🍺 ' + t('result.loser')),
-        el('div', { class: 'loser-name' }, loserName),
-        el('div', { class: 'loser-drink' }, t('result.drink', { n: drinks })),
+        el('div', { class: 'loser-name' }, this._nameOf(loser)),
+        el('div', { class: 'loser-drink' }, t('result.drink', { n: drinksOf(loser) })),
       ]),
     ]);
 
+    const cups = (p) => {
+      const d = drinksOf(p);
+      if (d === 0) return el('span', { class: 'rank-safe' }, '✅ ' + t('result.safe'));
+      return el('span', { class: 'rank-cups' }, `🍺 ×${d}`);
+    };
     const rankList = el('div', { class: 'rank-list' },
-      order.map((p, i) => el('div', { class: 'rank-row' + (p === loser ? ' is-loser' : '') }, [
+      order.map((p, i) => el('div', { class: 'rank-row' + (p === loser ? ' is-loser' : '') + (p === winner ? ' is-winner' : '') }, [
         el('span', { class: 'rank-no' }, i === 0 ? '👑' : `${i + 1}`),
         this.thumb(p.colorKey, i === 0 ? 'taunt' : 'idle', 44),
         el('span', { class: 'rank-name' }, this._nameOf(p)),
-        el('span', { class: 'rank-cups' }, '🍺'.repeat(Math.min(5, Math.max(0, p.penalty)))),
+        cups(p),
       ])));
 
     const buttons = el('div', { class: 'result-btns' }, [

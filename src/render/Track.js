@@ -46,6 +46,12 @@ export class Track {
     return this.dirtTop + this.laneH * (i + 0.86);
   }
 
+  // which lane a screen-y falls into (for vertically-falling items)
+  laneAtY(y) {
+    const i = Math.floor((y - this.dirtTop) / this.laneH);
+    return Math.max(0, Math.min(this.n - 1, i));
+  }
+
   ponyHeight() {
     return Math.max(34, Math.min(150, this.laneH * 0.96));
   }

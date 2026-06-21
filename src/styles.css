@@ -85,9 +85,11 @@ html, body {
 .rank-list { display: flex; flex-direction: column; gap: 3px; width: min(86vw, 460px); }
 .rank-row { display: flex; align-items: center; gap: 10px; background: #fff; border: 2px solid #e6d8c0; border-radius: 12px; padding: 2px 12px; }
 .rank-row.is-loser { background: #ffe9e4; border-color: #e0573e; }
+.rank-row.is-winner { background: #eafae8; border-color: #76c46a; }
 .rank-no { width: 28px; font-size: 18px; font-weight: 900; color: var(--ink); text-align: center; }
 .rank-name { flex: 1; text-align: left; font-weight: 800; color: var(--ink); }
-.rank-cups { font-size: 13px; letter-spacing: -2px; }
+.rank-cups { font-size: 14px; font-weight: 800; color: #c2552f; white-space: nowrap; }
+.rank-safe { font-size: 13px; font-weight: 800; color: #4a9e44; white-space: nowrap; }
 .result-btns { display: flex; gap: 12px; align-items: center; }
 .ghost-btn { font-size: 15px; font-weight: 800; color: var(--ink); background: #fff; border: 3px solid var(--ink);
   border-radius: 14px; padding: 9px 18px; cursor: pointer; box-shadow: 0 4px 0 rgba(58,42,32,.3); }

@@ -43,9 +43,8 @@ export class Game {
   }
 
   _finish(results) {
-    const drinks = Math.max(1, results.loser.penalty);
     setTimeout(() => stopBgm(), 400);
-    this.ui.showResult(results, drinks);
+    this.ui.showResult(results);
   }
 
   _checkOrientation() {

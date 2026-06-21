@@ -9,11 +9,12 @@ const RARE_GLOW = 0xffe66a;
 const COMMON_GLOW = 0xfff6d8;
 
 export class ItemMeteor {
-  constructor(app, assets, type, { from, to, flyTime, laneIndex, iconSize, onCatch, onMiss }) {
+  constructor(app, assets, type, { from, to, flyTime, laneIndex, iconSize, vertical = false, onCatch, onMiss }) {
     this.app = app;
     this.type = type;
     this.def = ITEMS[type];
     this.laneIndex = laneIndex;
+    this.vertical = vertical; // lane resolved from tap-y at catch time
     this.onCatch = onCatch;
     this.onMiss = onMiss;
     this.from = from; this.to = to;

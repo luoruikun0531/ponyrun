@@ -27,21 +27,23 @@ export const ITEMS = {
     effect: (race, t) => race.trip(t.pony, M.bananaTrip, M.bananaBack),
   },
   penaltyPlus: {
-    rarity: 'common', weight: 16, flyTime: 2.3, icon: 'mug', badge: '+1', target: 'lane',
+    rarity: 'common', weight: 23, flyTime: 2.3, icon: 'mug', badge: '+1', target: 'lane',
     effect: (race, t) => race.addPenalty(t.pony, +1),
   },
   penaltyMinus: {
-    rarity: 'common', weight: 16, flyTime: 2.3, icon: 'mug', badge: '-1', target: 'lane',
+    rarity: 'common', weight: 23, flyTime: 2.3, icon: 'mug', badge: '-1', target: 'lane',
     effect: (race, t) => race.addPenalty(t.pony, -1),
   },
 
-  // ── Rare: fast, hard to tap, explosive ───────────────────────────
+  // ── Rare: fall vertically across all lanes; tap over a lane to target
+  //    that lane's pony. Fast & hard to tap = explosive payoff. ──────
   swap: {
-    rarity: 'rare', weight: 7, flyTime: 1.25, icon: 'swap', target: 'pair',
-    effect: (race, t) => race.swapPositions(t.a, t.b),
+    rarity: 'rare', weight: 8, flyTime: 1.7, icon: 'swap', target: 'lane', fly: 'vertical',
+    // swap the tapped pony's track position (x) with the current leader's
+    effect: (race, t) => race.swapPositions(t.pony, race.leader()),
   },
   missile: {
-    rarity: 'rare', weight: 6, flyTime: 1.0, icon: 'missile', target: 'leader',
+    rarity: 'rare', weight: 7, flyTime: 1.6, icon: 'missile', target: 'lane', fly: 'vertical',
     effect: (race, t) => race.knockback(t.pony, M.missileBack),
   },
   hitchhike: {

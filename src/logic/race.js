@@ -141,7 +141,8 @@ export class Race {
   }
 
   addPenalty(pony, delta) {
-    pony.penalty = Math.max(0, pony.penalty + delta);
+    // floor at 1: everyone owes at least one cup, so −1 on a 1 does nothing
+    pony.penalty = Math.max(1, pony.penalty + delta);
     this.emit('penalty', { pony, delta });
   }
 

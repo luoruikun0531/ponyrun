@@ -77,13 +77,14 @@ describe('item effects', () => {
     expect(gained).toBeGreaterThan(0);
   });
 
-  it('penalty ± adjusts drink count and never goes negative', () => {
+  it('penalty ± adjusts drink count and floors at 1 (everyone owes ≥1)', () => {
     const race = new Race({ seed: 9, ponies: mkPonies(3) });
+    expect(race.ponies[1].penalty).toBe(1); // base: one cup each
     race.applyItem('penaltyPlus', { laneIndex: 1 });
     expect(race.ponies[1].penalty).toBe(2);
     race.applyItem('penaltyMinus', { laneIndex: 1 });
     race.applyItem('penaltyMinus', { laneIndex: 1 });
-    expect(race.ponies[1].penalty).toBe(0);
+    expect(race.ponies[1].penalty).toBe(1); // −1 on a 1 does nothing
   });
 
   it('swap exchanges two ponies positions', () => {

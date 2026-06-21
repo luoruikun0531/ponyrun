@@ -22,6 +22,7 @@ export default {
   result: {
     winner: '冠军',
     loser: '输家',
+    safe: '免喝',
     drink: '罚酒 {n} 杯！',
     cheers: '干杯！🍻',
     replay: '再来一局',

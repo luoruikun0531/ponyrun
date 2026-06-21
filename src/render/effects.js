@@ -24,6 +24,10 @@ export class Effects {
     return e;
   }
 
+  // Attach an externally-built display object with a per-frame updater
+  // (dt) => alive. Used for the homing missile. Self-removes when it returns false.
+  attach(displayObject, updateFn) { return this._add(displayObject, updateFn); }
+
   burst(x, y, { color = 0xffd34d, count = 14, speed = 320, size = 6, gravity = 700 } = {}) {
     const g = new Graphics();
     const parts = Array.from({ length: count }, (_, i) => {
