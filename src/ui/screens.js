@@ -59,6 +59,7 @@ export class UI {
     this._syncToggles();
     if (this._screen === 'start') this.showStart();
     else if (this._screen === 'result' && this._lastResults) this.showResult(this._lastResults);
+    if (this._rotate) { this.setRotate(false); this.setRotate(true); }
   }
 
   hideAll() { clear(this.layer); this._screen = null; }
@@ -181,8 +182,12 @@ export class UI {
   // ── Rotate hint ──────────────────────────────────────────────────────
   setRotate(show) {
     if (show && !this._rotate) {
+      const ponies = el('div', { class: 'rotate-ponies' },
+        PONIES.map((p) => this.thumb(p.key, 'idle', 60)));
       this._rotate = el('div', { class: 'rotate' }, [
-        el('div', { class: 'rotate-emoji' }, '📱↻'),
+        el('div', { class: 'rotate-brand' }, [t('appTitle'), el('span', { class: 'hoof' }, '🐴')]),
+        ponies,
+        el('div', { class: 'rotate-emoji' }, '📱'),
         el('div', { class: 'rotate-title' }, t('rotate.title')),
         el('div', { class: 'rotate-desc' }, t('rotate.desc')),
       ]);

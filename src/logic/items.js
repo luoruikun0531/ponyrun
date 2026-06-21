@@ -8,12 +8,12 @@ import { TRACK_LEN } from './constants.js';
 
 // Effect magnitudes, all in one place for tuning the 30% item layer.
 const M = {
-  dashBoost: 1.35,   // ×base added velocity
+  dashBoost: 1.2,   // ×base added velocity
   dashDur: 1.7,      // seconds
-  bananaBack: 0.033 * TRACK_LEN,
+  bananaBack: 0.028 * TRACK_LEN,
   bananaTrip: 1.0,   // seconds stalled
-  missileBack: 0.193 * TRACK_LEN,
-  rideFwd: 0.17 * TRACK_LEN,
+  missileBack: 0.165 * TRACK_LEN,
+  rideFwd: 0.14 * TRACK_LEN,
 };
 
 export const ITEMS = {
@@ -38,16 +38,16 @@ export const ITEMS = {
   // ── Rare: fall vertically across all lanes; tap over a lane to target
   //    that lane's pony. Fast & hard to tap = explosive payoff. ──────
   swap: {
-    rarity: 'rare', weight: 8, flyTime: 1.7, icon: 'swap', target: 'lane', fly: 'vertical',
+    rarity: 'rare', weight: 5, flyTime: 1.7, icon: 'swap', target: 'lane', fly: 'vertical',
     // swap the tapped pony's track position (x) with the current leader's
     effect: (race, t) => race.swapPositions(t.pony, race.leader()),
   },
   missile: {
-    rarity: 'rare', weight: 7, flyTime: 1.6, icon: 'missile', target: 'lane', fly: 'vertical',
+    rarity: 'rare', weight: 6, flyTime: 1.6, icon: 'missile', target: 'lane', fly: 'vertical',
     effect: (race, t) => race.knockback(t.pony, M.missileBack),
   },
   hitchhike: {
-    rarity: 'rare', weight: 7, flyTime: 1.3, icon: 'car', target: 'last',
+    rarity: 'rare', weight: 6, flyTime: 1.6, icon: 'car', target: 'lane', fly: 'vertical',
     effect: (race, t) => race.rideForward(t.pony, M.rideFwd),
   },
 };

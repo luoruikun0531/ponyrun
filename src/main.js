@@ -20,21 +20,39 @@ function setLoading(show) {
 
 async function boot() {
   setLoading(true);
+  const appEl = document.getElementById('app');
   const app = new Application();
   await app.init({
-    resizeTo: window,
+    width: appEl.clientWidth || window.innerWidth,
+    height: appEl.clientHeight || window.innerHeight,
     background: '#8ec9e8',
     antialias: true,
     resolution: Math.min(2, window.devicePixelRatio || 1),
     autoDensity: true,
   });
-  document.getElementById('app').appendChild(app.canvas);
+  appEl.appendChild(app.canvas);
+
+  // Robust sizing: match the renderer to the #app box (the layout viewport) so
+  // the canvas always fills the screen. Re-fit on every event that can change
+  // the mobile viewport, plus delayed re-checks for the iOS Safari toolbar.
+  const fit = () => {
+    // viewport-fit=cover ⇒ innerWidth/Height span the full screen incl. notch
+    const w = Math.max(window.innerWidth || 0, appEl.clientWidth || 0);
+    const h = Math.max(window.innerHeight || 0, appEl.clientHeight || 0);
+    if (w > 1 && h > 1) app.renderer.resize(w, h);
+  };
+  window.addEventListener('resize', fit);
+  window.addEventListener('orientationchange', () => { fit(); setTimeout(fit, 250); setTimeout(fit, 600); });
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', fit);
 
   const assets = await loadAssets();
   setLoading(false);
 
   const game = new Game(app, assets);
   game.start();
+  fit();
+  requestAnimationFrame(fit);
+  setTimeout(fit, 300);
   window.__game = game;
   onLangChange(() => { document.title = `${t('appTitle')} · PonyRun`; });
 }

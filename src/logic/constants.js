@@ -7,13 +7,13 @@ export const NOMINAL_TIME = 20;        // seconds, target mean finish time
 export const V_MEAN = TRACK_LEN / NOMINAL_TIME;
 
 // ── Layer ① Base speed — 40%, pure luck, fixed at the start ──────────────
-export const BASE_SPREAD = 0.107;       // per-pony base-speed std, as fraction of V_MEAN
+export const BASE_SPREAD = 0.118;       // per-pony base-speed std, as fraction of V_MEAN
 export const BASE_MIN = 0.55;          // clamp base to [min,max] × V_MEAN so nobody is hopeless
 export const BASE_MAX = 1.5;
 
 // ── Layer ② Slowdown events — 30%, non-item, rubber-band catch-up ────────
 export const SLOW = {
-  baseProbPerSec: 0.70,   // baseline stumble starts per second per pony
+  baseProbPerSec: 0.80,   // baseline stumble starts per second per pony
   rubber: 0.55,           // leader's prob ×(1+rubber), trailer's ×(1−rubber)
   durMin: 0.45,
   durMax: 1.05,

@@ -15,7 +15,8 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: var(--sky);
+  /* sky→ground gradient: a safety net so any seam blends with the game, never flat blue */
+  background: linear-gradient(180deg, #8ec9e8 0%, #8ec9e8 40%, #d3a169 45%, #c4914f 100%);
   overscroll-behavior: none;
   touch-action: manipulation;
   user-select: none;
@@ -24,7 +25,19 @@ html, body {
 
 #app { position: fixed; inset: 0; }
 
-#app canvas { display: block; width: 100%; height: 100%; }
+/* Full-bleed canvas. position:fixed + 100vw/vh + !important beat PixiJS
+   autoDensity's inline styles, so the canvas covers the whole screen edge to
+   edge — including under the notch / safe areas in landscape (viewport-fit=cover). */
+#app canvas {
+  display: block;
+  position: fixed;
+  inset: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+}
+@supports (height: 100dvh) {
+  #app canvas { width: 100dvw !important; height: 100dvh !important; }
+}
 
 /* ───────────────────────── UI overlay ───────────────────────── */
 #ui { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 10; }
@@ -95,10 +108,18 @@ html, body {
   border-radius: 14px; padding: 9px 18px; cursor: pointer; box-shadow: 0 4px 0 rgba(58,42,32,.3); }
 .ghost-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(58,42,32,.3); }
 
-/* Rotate hint */
-.rotate { position: fixed; inset: 0; z-index: 60; background: var(--sky); display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 20px; }
-.rotate-emoji { font-size: 80px; animation: rot 2s ease-in-out infinite; }
+/* Rotate hint — a branded onboarding screen, not a flat blue void */
+.rotate { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 18px; text-align: center; padding: 24px;
+  background: linear-gradient(180deg, #8ec9e8 0%, #a6d6ee 46%, #d8ac72 60%, #c4914f 100%); }
+.rotate-brand { font-size: clamp(30px, 6vw, 44px); font-weight: 900; color: var(--ink); display: flex; align-items: center; gap: 10px; letter-spacing: 1px; }
+.rotate-brand .hoof { animation: bob 1s ease-in-out infinite; }
+.rotate-ponies { display: flex; gap: 12px; }
+.rotate-ponies .thumb { animation: bob 1.3s ease-in-out infinite; }
+.rotate-ponies .thumb:nth-child(2) { animation-delay: .15s; }
+.rotate-ponies .thumb:nth-child(3) { animation-delay: .3s; }
+.rotate-ponies .thumb:nth-child(4) { animation-delay: .45s; }
+.rotate-emoji { font-size: 72px; margin-top: 6px; animation: rot 2s ease-in-out infinite; transform-origin: center; }
 @keyframes rot { 0%,100% { transform: rotate(-12deg) } 50% { transform: rotate(78deg) } }
-.rotate-title { font-size: 26px; font-weight: 900; color: var(--ink); }
-.rotate-desc { font-size: 15px; font-weight: 600; color: #5a6a78; max-width: 320px; }
+.rotate-title { font-size: clamp(22px, 5vw, 28px); font-weight: 900; color: var(--ink); }
+.rotate-desc { font-size: clamp(13px, 3.4vw, 16px); font-weight: 700; color: #5a4a38; max-width: 340px; }

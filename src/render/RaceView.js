@@ -151,11 +151,8 @@ export class RaceView {
       const topDown = Math.random() < 0.5;
       from = { x, y: topDown ? -60 : h + 60 };
       to = { x, y: topDown ? h + 60 : -60 };
-    } else if (type === 'hitchhike') {
-      lane = this.race.last().index;
-      const y = this.track.laneGroundY(lane) - ph * 0.55;
-      from = { x: -70, y }; to = { x: w + 70, y };
     } else {
+      // common items streak horizontally along a random lane
       const y = this.track.laneGroundY(lane) - ph * 0.7;
       const ltr = Math.random() < 0.5;
       from = { x: ltr ? -70 : w + 70, y }; to = { x: ltr ? w + 70 : -70, y };
@@ -179,9 +176,44 @@ export class RaceView {
     if (meteor.type === 'missile') {
       meteor.dead = true; // remove the pickup; a homing rocket flies to the target
       this._launchMissile(x, y, laneIndex);
+    } else if (meteor.type === 'hitchhike') {
+      meteor.dead = true; // a car drives over to pick up that lane's pony
+      this._launchCar(x, y, laneIndex);
     } else {
       this.race.applyItem(meteor.type, { laneIndex });
     }
+  }
+
+  // Caught hitchhike: a car drives to the targeted pony, boosts it forward, drives off.
+  _launchCar(fromX, fromY, laneIndex) {
+    const target = this.actors[laneIndex];
+    const ph = this.track.ponyHeight();
+    const spr = new Sprite(this.assets.items.car);
+    spr.anchor.set(0.5);
+    spr.scale.set((ph * 0.85) / Math.max(spr.texture.width, spr.texture.height));
+    spr.x = fromX; spr.y = fromY;
+    sfx.ride();
+    let phase = 0; let t = 0; let applied = false;
+    this.effects.attach(spr, (dt) => {
+      t += dt;
+      if (phase === 0) { // drive over to just behind the pony
+        const tx = target.container.x - ph * 0.45;
+        const ty = target.container.y - ph * 0.2;
+        const dx = tx - spr.x; const dy = ty - spr.y; const dist = Math.hypot(dx, dy) || 1;
+        if (dist < ph * 0.3 || t > 1.2) {
+          if (!applied) { this.race.applyItem('hitchhike', { laneIndex }); applied = true; }
+          phase = 1; t = 0; return true;
+        }
+        const step = Math.min(dist, 1000 * dt);
+        spr.x += (dx / dist) * step; spr.y += (dy / dist) * step;
+        return true;
+      }
+      // carry forward alongside the pony, then fade out
+      spr.x += 460 * dt;
+      spr.y = target.container.y - ph * 0.2;
+      spr.alpha -= dt * 1.3;
+      return spr.alpha > 0;
+    });
   }
 
   // Caught missile: a rocket streaks to the targeted pony, then detonates.
