@@ -60,6 +60,11 @@ export class Track {
     return this.startX + x * (this.finishX - this.startX);
   }
 
+  // world-space rect of the background, so the camera can clamp inside it
+  bgBounds() {
+    return { left: this.bg.x, top: this.bg.y, right: this.bg.x + this.bg.width, bottom: this.bg.y + this.bg.height };
+  }
+
   _drawLanes() {
     const g = this.lanesGfx;
     g.clear();

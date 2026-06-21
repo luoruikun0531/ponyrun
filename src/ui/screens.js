@@ -140,7 +140,7 @@ export class UI {
     const drinksOf = (p) => (p === winner ? 0 : Math.max(1, p.penalty));
 
     const loserCard = el('div', { class: 'loser-reveal' }, [
-      this.thumb(loser.colorKey, 'cry', 130),
+      this.thumb(loser.colorKey, 'cry', 104),
       el('div', { class: 'loser-text' }, [
         el('div', { class: 'loser-label' }, '🍺 ' + t('result.loser')),
         el('div', { class: 'loser-name' }, this._nameOf(loser)),
@@ -167,10 +167,12 @@ export class UI {
     ]);
 
     this.layer.appendChild(el('div', { class: 'panel result-panel' }, [
-      loserCard,
-      el('div', { class: 'section-label' }, t('result.rankTitle')),
-      rankList,
-      buttons,
+      el('div', { class: 'result-left' }, [loserCard]),
+      el('div', { class: 'result-right' }, [
+        el('div', { class: 'section-label' }, t('result.rankTitle')),
+        rankList,
+        buttons,
+      ]),
     ]));
   }
 

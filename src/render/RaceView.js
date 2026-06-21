@@ -11,10 +11,15 @@ import { Effects } from './effects.js';
 import { Race } from '../logic/race.js';
 import { makeRng, randomSeed } from '../logic/rng.js';
 import { rollItemType, ITEMS } from '../logic/items.js';
-import { FINISH_SUSPENSE_X } from '../logic/constants.js';
 import { sfx } from '../audio/sfx.js';
-import { setBgmTempo } from '../audio/bgm.js';
 import { t } from '../i18n/index.js';
+
+// Camera: wide establishing shot before GO, then a close-up that follows the
+// current leader (kept near the right edge) and holds — no finish slow-mo.
+const CLOSE_SCALE = 1.55;       // race close-up zoom
+const LEADER_ANCHOR_X = 0.8;    // keep the leader at ~80% across the screen
+const DIRT_ANCHOR_Y = 0.52;     // vertical placement of the lane band
+const CAM_EASE = 0.14;          // camera smoothing per 1/60s frame
 
 export class RaceView {
   constructor(app, assets) {
@@ -27,19 +32,22 @@ export class RaceView {
     this.itemLayer = new Container();
     this.fxLayer = new Container();
     this.world.addChild(this.track.container, this.actorLayer, this.itemLayer, this.fxLayer);
-    this.effects = new Effects(app, this.fxLayer);
+    this.effects = new Effects(app, this.fxLayer);          // world-space (pony-anchored)
+    this.screenFx = new Container();                        // screen-space (confetti, full-screen)
+    this.screenEffects = new Effects(app, this.screenFx);
     this.actors = [];
     this.meteors = [];
     this.speedStops = {};
     this.race = null;
     this.running = false;
-    this.timescale = 1;
+    this.cam = { scale: 1, x: 0, y: 0 };
+    this.cameraMode = 'wide';
     this._tick = (ticker) => this.update(ticker);
   }
 
   mount() {
     this.app.stage.eventMode = 'static';
-    this.app.stage.addChild(this.world);
+    this.app.stage.addChild(this.world, this.screenFx);
     this.app.ticker.add(this._tick);
   }
 
@@ -64,10 +72,10 @@ export class RaceView {
       actor.setBaseAnim('idle');
       return actor;
     });
-    this.relayout();
     this.finishHandled = false;
-    this.timescale = 1;
+    this.cameraMode = 'wide';
     this._resetCamera();
+    this.relayout();
     this.nextItemAt = 2.4;
   }
 
@@ -89,6 +97,7 @@ export class RaceView {
   start(onFinish) {
     this.onFinish = onFinish;
     this.running = true;
+    this.cameraMode = 'follow';
     this.actors.forEach((a) => a.setBaseAnim('run'));
   }
 
@@ -100,13 +109,12 @@ export class RaceView {
       m.update(dtReal); // items run in real time even during slow-mo
       if (m.dead) { m.destroy(); this.meteors.splice(i, 1); }
     }
+    if (this.race) this._updateCamera(dtReal);
     if (!this.running || !this.race) return;
 
-    const dt = dtReal * this.timescale;
-    this.race.step(dt);
+    this.race.step(dtReal); // real time throughout — no finish slow-mo
     this._syncActors();
     this._spawnItems(dtReal);
-    this._finishCamera();
     if (this.race.finished && !this.finishHandled) this._handleFinish();
   }
 
@@ -134,28 +142,30 @@ export class RaceView {
   }
 
   _spawn() {
-    const w = this.app.screen.width;
-    const h = this.app.screen.height;
     const type = rollItemType(this.race.rng, this.race.leader().x);
     const def = ITEMS[type];
     const n = this.actors.length;
     const ph = this.track.ponyHeight();
     const iconSize = ph * (def.rarity === 'rare' ? 0.92 : 0.78);
+    // spawn inside the visible camera window so items are always reachable
+    const vis = this._visibleWorld();
+    const m = 70 / (this.cam.scale || 1);
 
     let lane = (Math.random() * n) | 0;
     let from; let to; let vertical = false;
     if (def.fly === 'vertical') {
       // falls across every lane; the target is whichever lane it's tapped over
       vertical = true;
-      const x = w * (0.2 + Math.random() * 0.62);
+      const x = vis.left + (vis.right - vis.left) * (0.18 + Math.random() * 0.64);
       const topDown = Math.random() < 0.5;
-      from = { x, y: topDown ? -60 : h + 60 };
-      to = { x, y: topDown ? h + 60 : -60 };
+      from = { x, y: topDown ? vis.top - m : vis.bottom + m };
+      to = { x, y: topDown ? vis.bottom + m : vis.top - m };
     } else {
-      // common items streak horizontally along a random lane
+      // common items streak horizontally along a random lane, across the view
       const y = this.track.laneGroundY(lane) - ph * 0.7;
       const ltr = Math.random() < 0.5;
-      from = { x: ltr ? -70 : w + 70, y }; to = { x: ltr ? w + 70 : -70, y };
+      from = { x: ltr ? vis.left - m : vis.right + m, y };
+      to = { x: ltr ? vis.right + m : vis.left - m, y };
     }
 
     const meteor = new ItemMeteor(this.app, this.assets, type, {
@@ -261,27 +271,47 @@ export class RaceView {
     r.on('slowdown', ({ pony }) => { const { x, y } = at(pony); this.effects.burst(x, y + 10, { color: 0xccb089, count: 5, speed: 120, size: 4, gravity: 200 }); });
   }
 
-  // ── finish camera + reveal ───────────────────────────────────────────
-  _resetCamera() { this.world.scale.set(1); this.world.position.set(0, 0); }
+  // ── camera: wide before GO, then a held close-up that follows the leader ──
+  _resetCamera() {
+    this.cam = { scale: 1, x: 0, y: 0 };
+    this.world.scale.set(1);
+    this.world.position.set(0, 0);
+  }
 
-  _finishCamera() {
-    const lead = this.race.leader();
-    if (lead.x > FINISH_SUSPENSE_X && !this.race.finished) {
-      this.timescale += (0.5 - this.timescale) * 0.04;
-      setBgmTempo(1.18);
-      const s = 1 + (this.world.scale.x < 1.16 ? 0.01 : 0);
-      const focusX = this.track.finishX * 0.96;
-      const focusY = (this.track.dirtTop + this.track.dirtBottom) / 2;
-      const ns = this.world.scale.x + (1.16 - this.world.scale.x) * 0.04;
-      this.world.scale.set(ns);
-      this.world.position.set(this.app.screen.width / 2 - focusX * ns, this.app.screen.height / 2 - focusY * ns);
+  _updateCamera(dt) {
+    const w = this.app.screen.width;
+    const h = this.app.screen.height;
+    let s = 1; let x = 0; let y = 0;
+    if (this.cameraMode === 'follow') {
+      s = CLOSE_SCALE;
+      const leadX = this.track.mapX(this.race.leader().x);
+      x = w * LEADER_ANCHOR_X - leadX * s;             // keep leader at ~80% width
+      const dirtCenter = (this.track.dirtTop + this.track.dirtBottom) / 2;
+      y = h * DIRT_ANCHOR_Y - dirtCenter * s;          // keep all lanes in frame
+      // clamp so the view never pans past the background (no blank edges)
+      const b = this.track.bgBounds();
+      const clamp = (v, lo, hi) => (lo > hi ? (lo + hi) / 2 : Math.max(lo, Math.min(hi, v)));
+      x = clamp(x, w - b.right * s, -b.left * s);
+      y = clamp(y, h - b.bottom * s, -b.top * s);
     }
+    const k = 1 - Math.pow(1 - CAM_EASE, dt * 60);
+    this.cam.scale += (s - this.cam.scale) * k;
+    this.cam.x += (x - this.cam.x) * k;
+    this.cam.y += (y - this.cam.y) * k;
+    this.world.scale.set(this.cam.scale);
+    this.world.position.set(this.cam.x, this.cam.y);
+  }
+
+  // current visible rect in world coords (for spawning reachable items)
+  _visibleWorld() {
+    const w = this.app.screen.width;
+    const h = this.app.screen.height;
+    const s = this.cam.scale || 1;
+    return { left: -this.cam.x / s, right: (w - this.cam.x) / s, top: -this.cam.y / s, bottom: (h - this.cam.y) / s };
   }
 
   _handleFinish() {
     this.finishHandled = true;
-    this.timescale = 1;
-    setBgmTempo(1);
     const { winner, loser } = this.race.results;
     this.actors.forEach((a, i) => {
       const p = this.race.ponies[i];
@@ -292,20 +322,21 @@ export class RaceView {
       else a.setBaseAnim('idle');
     });
     const wa = this.actors[winner.index];
-    const la = this.actors[loser.index];
     const ph = this.track.ponyHeight();
     sfx.win();
-    this.effects.confetti(this.app.screen.width, this.app.screen.height);
+    setTimeout(() => sfx.lose(), 600);
+    this.screenEffects.confetti(this.app.screen.width, this.app.screen.height); // full-screen
     this.effects.popup(wa.container.x, wa.container.y - ph * 1.2, '👑 ' + t('result.winner'), { color: 0xffd24a, size: 30 });
-    setTimeout(() => { sfx.lose(); this.effects.popup(la.container.x, la.container.y - ph * 1.2, '🍺 ' + t('result.loser'), { color: 0xff7a6a, size: 30 }); }, 600);
 
-    this.running = false;
+    this.running = false; // camera stays in 'follow' → holds the close-up on the winner
     if (this.onFinish) setTimeout(() => this.onFinish(this.race.results), 1700);
   }
 
   destroy() {
     this.app.ticker.remove(this._tick);
     this.effects.destroy();
+    this.screenEffects.destroy();
     this.world.destroy({ children: true });
+    this.screenFx.destroy({ children: true });
   }
 }
