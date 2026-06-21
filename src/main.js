@@ -36,7 +36,7 @@ async function boot() {
   const game = new Game(app, assets);
   game.start();
   window.__game = game;
-  onLangChange(() => { document.title = `${t('appTitle')} · Line Pony`; });
+  onLangChange(() => { document.title = `${t('appTitle')} · PonyRun`; });
 }
 
 boot();

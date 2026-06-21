@@ -1,7 +1,7 @@
 {
-  "name": "line-pony",
+  "name": "ponyrun",
   "version": "1.0.0",
-  "description": "线条小马 · Line Pony — an ultra-light party drinking game. Ponies race, you grab items, the loser drinks.",
+  "description": "小马快跑 · PonyRun — an ultra-light party drinking game. Ponies race, you grab items, the loser drinks.",
   "type": "module",
   "scripts": {
     "dev": "vite",

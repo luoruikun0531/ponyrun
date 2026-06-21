@@ -1,5 +1,5 @@
 export default {
-  appTitle: '线条小马',
+  appTitle: '小马快跑',
   tagline: '围着一台手机，看小马赛跑，输的人喝酒',
   loading: '加载中…',
   langName: '中',

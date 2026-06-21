@@ -1,5 +1,5 @@
 export default {
-  appTitle: 'Line Pony',
+  appTitle: 'PonyRun',
   tagline: 'Gather round one phone — ponies race, the loser drinks',
   loading: 'Loading…',
   langName: 'EN',
