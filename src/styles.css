@@ -142,3 +142,16 @@ html, body {
 .install-tip.up .tip-arrow { animation: tipUp 1s ease-in-out infinite; }
 @keyframes tipDown { 0%,100% { transform: translateY(0) } 50% { transform: translateY(7px) } }
 @keyframes tipUp { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }
+
+/* Setup sliders: track length + item density */
+.sliders { display: flex; gap: 12px; width: 100%; justify-content: center; flex-wrap: wrap; }
+.slider-row { display: flex; align-items: center; gap: 8px; background: #fff7e9; border: 2.5px solid var(--ink);
+  border-radius: 12px; padding: 4px 10px; }
+.slider-label { font-size: 12px; font-weight: 800; color: var(--ink); white-space: nowrap; }
+.slider-val { font-size: 12px; font-weight: 900; color: var(--accent); min-width: 30px; text-align: right; }
+.slider { -webkit-appearance: none; appearance: none; width: 104px; height: 8px; border-radius: 999px;
+  background: #e6d8c0; outline: none; cursor: pointer; }
+.slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px;
+  border-radius: 50%; background: var(--accent); border: 3px solid var(--ink); cursor: pointer; }
+.slider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--accent);
+  border: 3px solid var(--ink); cursor: pointer; }

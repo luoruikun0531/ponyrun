@@ -54,7 +54,8 @@ export class RaceView {
   setup(config) {
     this.config = config;
     const rng = makeRng(config.seed ?? randomSeed());
-    this.race = new Race({ rng, ponies: config.ponies });
+    this.race = new Race({ rng, ponies: config.ponies, trackMul: config.trackMul ?? 1 });
+    this.itemDensity = config.itemDensity ?? 1;
     this._wireEvents();
 
     this.actorLayer.removeChildren();
@@ -134,10 +135,12 @@ export class RaceView {
 
   // ── items ────────────────────────────────────────────────────────────
   _spawnItems(dt) {
+    if (this.itemDensity <= 0) return; // items turned off by the density slider
     this.nextItemAt -= dt;
-    if (this.nextItemAt > 0 || this.meteors.length >= 2) return;
+    if (this.nextItemAt > 0 || this.meteors.length >= 3) return;
     const progress = this.race.leader().x;
-    this.nextItemAt = Math.max(1.0, 2.4 - progress * 1.3) + Math.random() * 1.1;
+    const base = Math.max(1.0, 2.4 - progress * 1.3) + Math.random() * 1.1;
+    this.nextItemAt = base / this.itemDensity; // denser = shorter gaps
     this._spawn();
   }
 

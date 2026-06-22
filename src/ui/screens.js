@@ -4,7 +4,7 @@
 
 import { el, clear } from './dom.js';
 import { t, getLang, toggleLang, onLangChange } from '../i18n/index.js';
-import { PONIES, MIN_PONIES, MAX_PONIES } from '../logic/constants.js';
+import { PONIES, MIN_PONIES, MAX_PONIES, TRACK_MUL, ITEM_DENSITY } from '../logic/constants.js';
 import { sfx, setMuted, isMuted, unlockAudio } from '../audio/sfx.js';
 
 const baseUrl = (import.meta.env.BASE_URL || '/');
@@ -26,6 +26,8 @@ export class UI {
     this.cb = callbacks;
     this.count = MAX_PONIES;
     this.names = {};
+    this.trackLen = TRACK_MUL.def;
+    this.itemDensity = ITEM_DENSITY.def;
     this.root = root;
     this.layer = el('div', { id: 'ui' });
     root.appendChild(this.layer);
@@ -97,6 +99,13 @@ export class UI {
         return el('div', { class: 'pony-card' }, [this.thumb(p.key, 'idle', 60), input]);
       }));
 
+    const fmtMul = (v) => `×${v.toFixed(1)}`;
+    const fmtDen = (v) => (v <= 0 ? t('settings.off') : `×${v.toFixed(1)}`);
+    const sliders = el('div', { class: 'sliders' }, [
+      this._slider(t('settings.track'), TRACK_MUL, this.trackLen, fmtMul, (v) => { this.trackLen = v; }),
+      this._slider(t('settings.items'), ITEM_DENSITY, this.itemDensity, fmtDen, (v) => { this.itemDensity = v; }),
+    ]);
+
     const playBtn = el('button', { class: 'play-btn', onClick: () => { unlockAudio(); sfx.go(); this._start(); } }, t('start.play'));
 
     const panel = el('div', { class: 'panel start-panel' }, [
@@ -105,17 +114,26 @@ export class UI {
       el('div', { class: 'section-label' }, t('start.ponies')),
       countChips,
       roster,
+      sliders,
       playBtn,
       el('div', { class: 'hint' }, t('start.hint')),
     ]);
     this.layer.appendChild(panel);
   }
 
+  // A labelled range slider that live-updates its value readout.
+  _slider(labelText, cfg, value, fmt, onInput) {
+    const val = el('span', { class: 'slider-val' }, fmt(value));
+    const input = el('input', { class: 'slider', type: 'range', min: cfg.min, max: cfg.max, step: cfg.step, value });
+    input.addEventListener('input', (e) => { const v = parseFloat(e.target.value); val.textContent = fmt(v); onInput(v); });
+    return el('div', { class: 'slider-row' }, [el('span', { class: 'slider-label' }, labelText), input, val]);
+  }
+
   _start() {
     const ponies = PONIES.slice(0, this.count).map((p, i) => ({
       id: i, colorKey: p.key, accent: p.accent, name: (this.names[p.key] ?? t(p.nameKey)).trim() || t(p.nameKey),
     }));
-    this.cb.onStart(ponies);
+    this.cb.onStart(ponies, { trackMul: this.trackLen, itemDensity: this.itemDensity });
   }
 
   // ── Countdown ────────────────────────────────────────────────────────

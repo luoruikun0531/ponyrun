@@ -13,11 +13,12 @@ export class Game {
     this.view = new RaceView(app, assets);
     this.view.mount();
     this.ui = new UI(document.getElementById('app'), assets, {
-      onStart: (ponies) => this._begin(ponies),
-      onReplay: () => this._begin(this.ponies, randomSeed()),
+      onStart: (ponies, settings) => this._begin(ponies, randomSeed(), settings),
+      onReplay: () => this._begin(this.ponies, randomSeed(), this.settings),
       onSetup: () => this._toMenu(),
     });
     this.ponies = null;
+    this.settings = { trackMul: 1, itemDensity: 1 };
     app.renderer.on('resize', () => { this.view.relayout(); this._checkOrientation(); });
     window.addEventListener('orientationchange', () => setTimeout(() => this._checkOrientation(), 200));
     this._checkOrientation();
@@ -30,11 +31,12 @@ export class Game {
     this.ui.showStart();
   }
 
-  _begin(ponies, seed = randomSeed()) {
+  _begin(ponies, seed = randomSeed(), settings = this.settings) {
     this.ponies = ponies;
+    this.settings = settings;
     unlockAudio();
     this.ui.hideAll();
-    this.view.setup({ ponies, seed });
+    this.view.setup({ ponies, seed, trackMul: settings.trackMul, itemDensity: settings.itemDensity });
     this.ui.countdown(() => {
       setBgmTempo(1);
       startBgm();

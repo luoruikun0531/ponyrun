@@ -12,8 +12,9 @@ import { ITEMS, resolveTargets } from './items.js';
 import { TRACK_LEN, V_MEAN, BASE_SPREAD, BASE_MIN, BASE_MAX, SLOW } from './constants.js';
 
 export class Race {
-  constructor({ seed = 1, ponies = [], rng = null } = {}) {
+  constructor({ seed = 1, ponies = [], rng = null, trackMul = 1 } = {}) {
     this.rng = rng || makeRng(seed);
+    this.trackMul = trackMul; // >1 = longer track ⇒ slower ⇒ longer race
     this.t = 0;
     this.finished = false;
     this.winner = null;
@@ -22,7 +23,7 @@ export class Race {
 
     this.ponies = ponies.map((p, i) => {
       const z = clamp(this.rng.normal(0, 1), -2.4, 2.4);
-      const base = V_MEAN * clamp(1 + BASE_SPREAD * z, BASE_MIN, BASE_MAX);
+      const base = (V_MEAN * clamp(1 + BASE_SPREAD * z, BASE_MIN, BASE_MAX)) / trackMul;
       return {
         id: p.id ?? i,
         index: i,

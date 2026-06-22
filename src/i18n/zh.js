@@ -12,6 +12,12 @@ export default {
     tapName: '点一下改名',
   },
 
+  settings: {
+    track: '赛道长度',
+    items: '道具密度',
+    off: '关',
+  },
+
   race: {
     ready: '预备…',
     go: '出发！',

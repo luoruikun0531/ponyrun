@@ -37,3 +37,9 @@ export const PONIES = [
 
 export const MIN_PONIES = 2;
 export const MAX_PONIES = 4;
+
+// Player-adjustable knobs (sliders on the setup screen).
+// Track length scales race duration (longer = slower base speed). Item density
+// scales spawn rate (0 = no items, 2 = twice as many); relative item odds keep.
+export const TRACK_MUL = { min: 0.5, max: 1.5, def: 1, step: 0.1 };
+export const ITEM_DENSITY = { min: 0, max: 2, def: 1, step: 0.1 };

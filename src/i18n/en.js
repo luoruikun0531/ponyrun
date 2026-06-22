@@ -12,6 +12,12 @@ export default {
     tapName: 'tap to rename',
   },
 
+  settings: {
+    track: 'Track length',
+    items: 'Item density',
+    off: 'Off',
+  },
+
   race: {
     ready: 'Ready…',
     go: 'GO!',
