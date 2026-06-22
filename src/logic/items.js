@@ -38,7 +38,9 @@ export const ITEMS = {
   // ── Rare: fall vertically across all lanes; tap over a lane to target
   //    that lane's pony. Fast & hard to tap = explosive payoff. ──────
   swap: {
-    rarity: 'rare', weight: 5, flyTime: 1.7, icon: 'swap', target: 'lane', fly: 'vertical',
+    // TEMPORARILY DISABLED (weight 0 → never spawns): swapping with the leader
+    // was too swingy. Restore a weight to bring it back.
+    rarity: 'rare', weight: 0, flyTime: 1.7, icon: 'swap', target: 'lane', fly: 'vertical',
     // swap the tapped pony's track position (x) with the current leader's
     effect: (race, t) => race.swapPositions(t.pony, race.leader()),
   },

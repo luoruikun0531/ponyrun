@@ -125,3 +125,20 @@ html, body {
 @keyframes rot { 0%,100% { transform: rotate(-12deg) } 50% { transform: rotate(78deg) } }
 .rotate-title { font-size: clamp(22px, 5vw, 28px); font-weight: 900; color: var(--ink); }
 .rotate-desc { font-size: clamp(13px, 3.4vw, 16px); font-weight: 700; color: #5a4a38; max-width: 340px; }
+
+/* "Add to Home Screen" nudge with an arrow pointing at the Share button */
+.install-tip { position: fixed; left: 50%; transform: translateX(-50%); z-index: 70;
+  display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: none; }
+.install-tip.down { position: absolute; bottom: max(16px, env(safe-area-inset-bottom, 0px)); }
+.install-tip.up { top: max(8px, env(safe-area-inset-top, 0px)); }
+.tip-text { display: inline-flex; align-items: center; gap: 5px; flex-wrap: wrap; justify-content: center;
+  background: rgba(255,253,247,.97); border: 2.5px solid var(--ink); border-radius: 999px;
+  padding: 5px 14px; font-size: 12.5px; font-weight: 800; color: var(--ink);
+  box-shadow: 0 3px 0 rgba(58,42,32,.25); max-width: 92vw; text-align: center; }
+.share-ico { display: inline-flex; color: #2f7fd6; }
+.share-ico svg { display: block; }
+.tip-arrow { font-size: 26px; font-weight: 900; color: #ff8a3d; -webkit-text-stroke: 3px var(--ink); line-height: 1; }
+.install-tip.down .tip-arrow { animation: tipDown 1s ease-in-out infinite; }
+.install-tip.up .tip-arrow { animation: tipUp 1s ease-in-out infinite; }
+@keyframes tipDown { 0%,100% { transform: translateY(0) } 50% { transform: translateY(7px) } }
+@keyframes tipUp { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-7px) } }

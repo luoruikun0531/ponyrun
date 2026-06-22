@@ -46,6 +46,11 @@ export default {
     desc: 'Landscape, flat on the table, play together',
   },
 
+  install: {
+    tap1: 'Want fullscreen? Tap',
+    tap2: 'Share → "Add to Home Screen"',
+  },
+
   colors: {
     white: 'Snowy', brown: 'Cocoa', gray: 'Smoky', yellow: 'Sunny',
   },

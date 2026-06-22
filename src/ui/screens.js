@@ -10,6 +10,16 @@ import { sfx, setMuted, isMuted, unlockAudio } from '../audio/sfx.js';
 const baseUrl = (import.meta.env.BASE_URL || '/');
 const asset = (p) => `${baseUrl}${p}`.replace(/([^:])\/\//g, '$1/');
 
+// iOS share glyph (box with an up arrow) so users recognise which button to tap.
+const SHARE_SVG = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M8.5 6.5 12 3l3.5 3.5"/><path d="M7 11H5.5A1.5 1.5 0 0 0 4 12.5v6A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5v-6A1.5 1.5 0 0 0 18.5 11H17"/></svg>';
+
+// Already running as an installed app? Then there's no browser chrome to fix.
+function isStandalone() {
+  try {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  } catch { return false; }
+}
+
 export class UI {
   constructor(root, assets, callbacks) {
     this.assets = assets;
@@ -174,11 +184,24 @@ export class UI {
         buttons,
       ]),
     ]));
+    const tip = this._installTip('up');
+    if (tip) this.layer.appendChild(tip);
   }
 
   _nameOf(pony) {
     const def = PONIES.find((p) => p.key === pony.colorKey);
     return (this.names[pony.colorKey] ?? '').trim() || (def ? t(def.nameKey) : pony.name);
+  }
+
+  // "Add to Home Screen" nudge with an arrow toward the Share button.
+  // dir 'down' (portrait → share is in the bottom bar), 'up' (landscape → top bar).
+  _installTip(dir) {
+    if (isStandalone()) return null;
+    const text = el('div', { class: 'tip-text' }, [
+      `${t('install.tap1')} `, el('span', { class: 'share-ico', html: SHARE_SVG }), ` ${t('install.tap2')}`,
+    ]);
+    const arrow = el('div', { class: 'tip-arrow' }, dir === 'down' ? '↓' : '↑');
+    return el('div', { class: `install-tip ${dir}` }, dir === 'down' ? [text, arrow] : [arrow, text]);
   }
 
   // ── Rotate hint ──────────────────────────────────────────────────────
@@ -192,6 +215,7 @@ export class UI {
         el('div', { class: 'rotate-emoji' }, '📱'),
         el('div', { class: 'rotate-title' }, t('rotate.title')),
         el('div', { class: 'rotate-desc' }, t('rotate.desc')),
+        this._installTip('down'),
       ]);
       this.root.appendChild(this._rotate);
     } else if (!show && this._rotate) {

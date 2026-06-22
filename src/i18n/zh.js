@@ -46,6 +46,11 @@ export default {
     desc: '横屏平放在桌上，大家一起玩',
   },
 
+  install: {
+    tap1: '想要全屏更爽？点',
+    tap2: '分享 →「添加到主屏幕」',
+  },
+
   colors: {
     white: '小白', brown: '小棕', gray: '小灰', yellow: '小黄',
   },
