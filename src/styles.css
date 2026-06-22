@@ -80,6 +80,26 @@ html, body {
 .play-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(58,42,32,.4); }
 @keyframes pulse { 0%,100% { transform: scale(1) } 50% { transform: scale(1.04) } }
 .hint { font-size: clamp(10px, 1.9vh, 12px); color: #9a8a76; font-weight: 600; max-width: 460px; }
+.start-actions { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.start-actions .play-btn { margin-top: 0; }
+.guide-btn { padding: 8px 18px; }
+
+/* Guide */
+.guide-panel { width: min(94vw, 820px); display: flex; flex-direction: column; gap: 5px; align-items: stretch; padding: 9px 18px; }
+.guide-heading { font-size: clamp(20px, 4.5vh, 30px); font-weight: 900; color: var(--ink); }
+.guide-section-title { font-size: 12px; font-weight: 900; color: #8a7a66; text-transform: uppercase; letter-spacing: 1px; text-align: left; }
+.guide-rules { margin: 0; padding-left: 24px; display: grid; gap: 3px; text-align: left; color: var(--ink); font-size: clamp(11px, 2.2vh, 14px); font-weight: 650; line-height: 1.35; }
+.guide-rules li::marker { color: var(--accent); font-weight: 900; }
+.guide-penalty-legend { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 5px 10px; border-radius: 10px; background: #ffe9e4; color: #9d412c; font-size: 12px; font-weight: 850; }
+.guide-legend-emoji { font-size: 22px; }
+.guide-items { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+.guide-item { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 6px 8px; border: 2px solid #e6d8c0; border-radius: 12px; background: #fff7e9; text-align: left; }
+.guide-item-icon, .guide-item-emoji { flex: 0 0 42px; width: 42px; height: 42px; object-fit: contain; }
+.guide-item-emoji { display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900; white-space: nowrap; }
+.guide-item-copy { min-width: 0; }
+.guide-item-name { color: var(--ink); font-size: 13px; font-weight: 900; }
+.guide-item-desc { color: #7a6a58; font-size: 10.5px; font-weight: 650; line-height: 1.25; }
+.guide-back { align-self: center; padding: 7px 20px; }
 
 /* Countdown */
 .countdown { font-size: clamp(70px, 26vh, 200px); font-weight: 900; color: #fff; -webkit-text-stroke: 6px var(--ink);
@@ -103,7 +123,7 @@ html, body {
 .rank-row.is-winner { background: #eafae8; border-color: #76c46a; }
 .rank-no { width: 28px; font-size: 18px; font-weight: 900; color: var(--ink); text-align: center; }
 .rank-name { flex: 1; text-align: left; font-weight: 800; color: var(--ink); }
-.rank-cups { font-size: 14px; font-weight: 800; color: #c2552f; white-space: nowrap; }
+.rank-penalty { font-size: 14px; font-weight: 800; color: #c2552f; white-space: nowrap; }
 .rank-safe { font-size: 13px; font-weight: 800; color: #4a9e44; white-space: nowrap; }
 .result-btns { display: flex; gap: 12px; align-items: center; justify-content: center; margin-top: 4px; }
 .ghost-btn { font-size: 15px; font-weight: 800; color: var(--ink); background: #fff; border: 3px solid var(--ink);

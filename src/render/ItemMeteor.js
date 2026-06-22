@@ -32,10 +32,15 @@ export class ItemMeteor {
       .fill({ color: rare ? RARE_GLOW : COMMON_GLOW, alpha: rare ? 0.55 : 0.35 });
     this.container.addChild(this.glow);
 
-    this.icon = new Sprite(assets.items[this.def.icon]);
-    this.icon.anchor.set(0.5);
-    const s = iconSize / Math.max(this.icon.texture.width, this.icon.texture.height);
-    this.icon.scale.set(s);
+    if (this.def.emoji) {
+      this.icon = new Text({ text: this.def.emoji, style: { fontSize: iconSize * 0.82 } });
+      this.icon.anchor.set(0.5);
+    } else {
+      this.icon = new Sprite(assets.items[this.def.icon]);
+      this.icon.anchor.set(0.5);
+      const s = iconSize / Math.max(this.icon.texture.width, this.icon.texture.height);
+      this.icon.scale.set(s);
+    }
     this.container.addChild(this.icon);
 
     if (this.def.badge) {

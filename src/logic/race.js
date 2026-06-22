@@ -33,7 +33,7 @@ export class Race {
         x: 0,
         vEff: base,
         rank: i,
-        penalty: 1,            // drinks owed; items nudge ±
+        penalty: 1,            // penalties owed; items nudge ±
         anim: 'run',
         impulses: [],          // {mult, until, tag}
         stumbleUntil: 0,

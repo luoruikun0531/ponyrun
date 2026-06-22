@@ -7,7 +7,7 @@ import { Assets, Texture, Rectangle } from 'pixi.js';
 const base = import.meta.env.BASE_URL || '/';
 const url = (p) => `${base}${p}`.replace(/([^:])\/\//g, '$1/');
 
-const ITEM_ICONS = ['dash', 'banana', 'swap', 'missile', 'car', 'mug'];
+const ITEM_ICONS = ['dash', 'banana', 'swap', 'missile', 'car'];
 
 let cache = null;
 

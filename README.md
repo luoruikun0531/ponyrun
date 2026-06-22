@@ -1,8 +1,8 @@
 # 小马快跑 · PonyRun 🐴
 
-> 围着一台手机，看几只可爱的线条小马赛跑，过程中抢道具搞事情，最后输的人喝酒。点开链接即玩——无需安装、无需注册、无需联网。
+> 围着一台手机，看几只可爱的线条小马赛跑，过程中抢道具搞事情。点开链接即玩——无需安装、无需注册、无需联网。
 >
-> A tiny party game: gather round **one phone laid flat on the table**, watch cute line-drawn ponies race, tap items flying by to cause chaos, and the loser drinks. Open the link and play — no install, no signup, no network.
+> A tiny party game: gather round **one phone laid flat on the table**, watch cute line-drawn ponies race, and tap items flying by to cause chaos. Open the link and play — no install, no signup, no network.
 
 中文 / English 双语 · 横屏 · 纯静态 · 运行时零 API 调用。
 
@@ -13,17 +13,16 @@
 1. 选 2–4 只小马（可改名）。Pick 2–4 ponies (rename if you like).
 2. 比赛中**道具像流星划过屏幕**，用手指点击抓取。Tap items as they streak across.
 3. **越稀有 → 飞得越快 → 越难抓 → 效果越炸裂。** Rarer = faster = harder = wilder.
-4. 终点揭晓，**最后一名喝酒**。Last across the line drinks. 🍺
+4. 最先冲线的小马获胜并免受惩罚。The first pony across wins with no penalty.
 
 ### 道具 / Items
 | | 道具 | 效果 |
 |---|---|---|
 | 常见 Common | ⚡ 冲刺 Dash | 小马切换四脚兽态狂奔向前冲 |
 | | 🍌 香蕉皮 Banana | 绊倒、停顿、后退 |
-| | 🍺 罚酒 ±1 Penalty | 喝酒数 +1 / −1 |
-| 罕见 Rare | 🔄 乾坤大挪移 Swap | 两只小马位置互换 |
-| | 🚀 导弹空袭 Missile | 当前第一名被炸退一大段 |
-| | 🚗 搭便车 Hitchhike | 当前最后一名搭车冲前 |
+| | 🤡 惩罚 ±1 Penalty | 最终惩罚次数 +1 / −1；一个 🤡 代表一次惩罚 |
+| 罕见 Rare | 🚀 导弹空袭 Missile | 选中赛道的小马被炸退一大段 |
+| | 🚗 搭便车 Hitchhike | 选中赛道的小马搭车冲前 |
 
 ---
 

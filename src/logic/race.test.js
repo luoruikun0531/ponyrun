@@ -77,9 +77,9 @@ describe('item effects', () => {
     expect(gained).toBeGreaterThan(0);
   });
 
-  it('penalty ± adjusts drink count and floors at 1 (everyone owes ≥1)', () => {
+  it('penalty ± adjusts the count and floors at 1 for non-winners', () => {
     const race = new Race({ seed: 9, ponies: mkPonies(3) });
-    expect(race.ponies[1].penalty).toBe(1); // base: one cup each
+    expect(race.ponies[1].penalty).toBe(1); // base: one penalty each
     race.applyItem('penaltyPlus', { laneIndex: 1 });
     expect(race.ponies[1].penalty).toBe(2);
     race.applyItem('penaltyMinus', { laneIndex: 1 });

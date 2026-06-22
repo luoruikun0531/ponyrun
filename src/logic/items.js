@@ -27,11 +27,11 @@ export const ITEMS = {
     effect: (race, t) => race.trip(t.pony, M.bananaTrip, M.bananaBack),
   },
   penaltyPlus: {
-    rarity: 'common', weight: 23, flyTime: 2.3, icon: 'mug', badge: '+1', target: 'lane',
+    rarity: 'common', weight: 23, flyTime: 2.3, emoji: '🤡', badge: '+1', target: 'lane',
     effect: (race, t) => race.addPenalty(t.pony, +1),
   },
   penaltyMinus: {
-    rarity: 'common', weight: 23, flyTime: 2.3, icon: 'mug', badge: '-1', target: 'lane',
+    rarity: 'common', weight: 23, flyTime: 2.3, emoji: '🤡', badge: '-1', target: 'lane',
     effect: (race, t) => race.addPenalty(t.pony, -1),
   },
 

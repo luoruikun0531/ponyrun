@@ -40,7 +40,7 @@ export function onLangChange(fn) {
   return () => subscribers.delete(fn);
 }
 
-// t('result.drink', { n: 3 }) — dotted key + {placeholder} interpolation.
+// t('result.replay') — dotted translation keys with optional interpolation.
 // English plural helper: {s} → '' when n===1 else 's'.
 export function t(key, params = {}) {
   const dict = DICTS[lang] || en;

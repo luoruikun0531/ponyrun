@@ -70,6 +70,7 @@ export class UI {
   _onLang() {
     this._syncToggles();
     if (this._screen === 'start') this.showStart();
+    else if (this._screen === 'guide') this.showGuide();
     else if (this._screen === 'result' && this._lastResults) this.showResult(this._lastResults);
     if (this._rotate) { this.setRotate(false); this.setRotate(true); }
   }
@@ -106,7 +107,10 @@ export class UI {
       this._slider(t('settings.items'), ITEM_DENSITY, this.itemDensity, fmtDen, (v) => { this.itemDensity = v; }),
     ]);
 
-    const playBtn = el('button', { class: 'play-btn', onClick: () => { unlockAudio(); sfx.go(); this._start(); } }, t('start.play'));
+    const actions = el('div', { class: 'start-actions' }, [
+      el('button', { class: 'play-btn', onClick: () => { unlockAudio(); sfx.go(); this._start(); } }, t('start.play')),
+      el('button', { class: 'ghost-btn guide-btn', onClick: () => { sfx.tapUI(); this.showGuide(); } }, t('guide.open')),
+    ]);
 
     const panel = el('div', { class: 'panel start-panel' }, [
       el('div', { class: 'title' }, [el('span', { class: 'title-zh' }, t('appTitle')), el('span', { class: 'hoof' }, '🐴')]),
@@ -115,7 +119,7 @@ export class UI {
       countChips,
       roster,
       sliders,
-      playBtn,
+      actions,
       el('div', { class: 'hint' }, t('start.hint')),
     ]);
     this.layer.appendChild(panel);
@@ -134,6 +138,50 @@ export class UI {
       id: i, colorKey: p.key, accent: p.accent, name: (this.names[p.key] ?? t(p.nameKey)).trim() || t(p.nameKey),
     }));
     this.cb.onStart(ponies, { trackMul: this.trackLen, itemDensity: this.itemDensity });
+  }
+
+  // ── Guide ────────────────────────────────────────────────────────────
+  showGuide() {
+    this._screen = 'guide';
+    clear(this.layer);
+    this.topbar.style.display = 'flex';
+
+    const itemRow = (key, icon) => el('div', { class: 'guide-item' }, [
+      icon.startsWith('emoji:')
+        ? el('span', { class: 'guide-item-emoji', role: 'img', 'aria-hidden': 'true' }, icon.slice(6))
+        : el('img', { class: 'guide-item-icon', src: asset(`assets/items/${icon}.png`), alt: '' }),
+      el('div', { class: 'guide-item-copy' }, [
+        el('div', { class: 'guide-item-name' }, t(`guide.items.${key}.name`)),
+        el('div', { class: 'guide-item-desc' }, t(`guide.items.${key}.desc`)),
+      ]),
+    ]);
+
+    const rules = el('ol', { class: 'guide-rules' }, [
+      el('li', {}, t('guide.rules.setup')),
+      el('li', {}, t('guide.rules.catch')),
+      el('li', {}, t('guide.rules.finish')),
+    ]);
+    const items = el('div', { class: 'guide-items' }, [
+      itemRow('dash', 'dash'),
+      itemRow('banana', 'banana'),
+      itemRow('penaltyPlus', 'emoji:🤡 +1'),
+      itemRow('penaltyMinus', 'emoji:🤡 −1'),
+      itemRow('missile', 'missile'),
+      itemRow('hitchhike', 'car'),
+    ]);
+
+    this.layer.appendChild(el('div', { class: 'panel guide-panel' }, [
+      el('div', { class: 'guide-heading' }, t('guide.title')),
+      el('div', { class: 'guide-section-title' }, t('guide.rulesTitle')),
+      rules,
+      el('div', { class: 'guide-penalty-legend' }, [
+        el('span', { class: 'guide-legend-emoji', role: 'img', 'aria-hidden': 'true' }, '🤡'),
+        el('span', {}, t('guide.penaltyLegend')),
+      ]),
+      el('div', { class: 'guide-section-title' }, t('guide.itemsTitle')),
+      items,
+      el('button', { class: 'ghost-btn guide-back', onClick: () => { sfx.tapUI(); this.showStart(); } }, t('guide.back')),
+    ]));
   }
 
   // ── Countdown ────────────────────────────────────────────────────────
@@ -164,8 +212,8 @@ export class UI {
     clear(this.layer);
     this.topbar.style.display = 'flex';
     const { order, winner, loser } = results;
-    // every pony owes 1 cup; the winner is exempt; items adjust the rest
-    const drinksOf = (p) => (p === winner ? 0 : Math.max(1, p.penalty));
+    // Every pony starts with 1 penalty; the winner is exempt.
+    const penaltiesOf = (p) => (p === winner ? 0 : Math.max(1, p.penalty));
 
     // left card celebrates the one winner (proud / taunt pose)
     const winnerCard = el('div', { class: 'winner-reveal' }, [
@@ -173,20 +221,19 @@ export class UI {
       el('div', { class: 'winner-text' }, [
         el('div', { class: 'winner-label' }, '👑 ' + t('result.winner')),
         el('div', { class: 'winner-name' }, this._nameOf(winner)),
-        el('div', { class: 'winner-safe' }, t('result.nodrink')),
+        el('div', { class: 'winner-safe' }, t('result.noPenalty')),
       ]),
     ]);
 
-    // everyone but the winner is a loser: crying thumb + their drink count
-    const cups = (p) => (p === winner
+    const points = (p) => (p === winner
       ? el('span', { class: 'rank-safe' }, '✅ ' + t('result.safe'))
-      : el('span', { class: 'rank-cups' }, `🍺 ×${drinksOf(p)}`));
+      : el('span', { class: 'rank-penalty' }, `🤡 ×${penaltiesOf(p)}`));
     const rankList = el('div', { class: 'rank-list' },
       order.map((p, i) => el('div', { class: 'rank-row' + (p === loser ? ' is-loser' : '') + (p === winner ? ' is-winner' : '') }, [
         el('span', { class: 'rank-no' }, i === 0 ? '👑' : `${i + 1}`),
         this.thumb(p.colorKey, p === winner ? 'taunt' : 'cry', 44),
         el('span', { class: 'rank-name' }, this._nameOf(p)),
-        cups(p),
+        points(p),
       ])));
 
     const buttons = el('div', { class: 'result-btns' }, [

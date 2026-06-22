@@ -1,7 +1,7 @@
 {
   "name": "小马快跑 · PonyRun",
   "short_name": "PonyRun",
-  "description": "围着一台手机看小马赛跑抢道具，输的人喝酒。A tiny party game: ponies race, you grab chaos, the loser drinks.",
+  "description": "围着一台手机看小马赛跑抢道具。A tiny party game: ponies race and you grab chaotic items.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
