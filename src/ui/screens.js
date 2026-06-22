@@ -3,7 +3,7 @@
 // Re-renders on language change. Pure DOM, mobile-first, landscape.
 
 import { el, clear } from './dom.js';
-import { t, getLang, toggleLang, onLangChange } from '../i18n/index.js';
+import { t, getLang, setLang, onLangChange, LANGUAGES } from '../i18n/index.js';
 import { PONIES, MIN_PONIES, MAX_PONIES, TRACK_MUL, ITEM_DENSITY } from '../logic/constants.js';
 import { sfx, setMuted, isMuted, unlockAudio } from '../audio/sfx.js';
 
@@ -54,14 +54,18 @@ export class UI {
   }
 
   _buildTopbar() {
-    this.langBtn = el('button', { class: 'chip-btn', onClick: () => { sfx.tapUI(); toggleLang(); } });
+    this.langSelect = el('select', {
+      class: 'lang-select',
+      'aria-label': 'Language',
+      onChange: (event) => { sfx.tapUI(); setLang(event.target.value); },
+    }, LANGUAGES.map(({ code, label }) => el('option', { value: code }, label)));
     this.muteBtn = el('button', { class: 'chip-btn', onClick: () => { unlockAudio(); setMuted(!isMuted()); this._syncMute(); sfx.tapUI(); } });
-    this.topbar.append(this.langBtn, this.muteBtn);
+    this.topbar.append(this.langSelect, this.muteBtn);
     this._syncToggles();
   }
 
   _syncToggles() {
-    this.langBtn.textContent = getLang() === 'zh' ? 'EN' : '中';
+    this.langSelect.value = getLang();
     this._syncMute();
   }
 

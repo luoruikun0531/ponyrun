@@ -1,10 +1,30 @@
-// Tiny bilingual layer (zh / en). No dependency. UI subscribes to language
-// changes so a toggle re-renders everything live.
+// Tiny dependency-free i18n layer. UI subscribes to language changes so it
+// can re-render everything live.
 
 import zh from './zh.js';
 import en from './en.js';
+import th from './th.js';
+import vi from './vi.js';
+import id from './id.js';
+import de from './de.js';
+import it from './it.js';
+import es from './es.js';
+import ko from './ko.js';
+import ja from './ja.js';
 
-const DICTS = { zh, en };
+const DICTS = { zh, en, th, vi, id, de, it, es, ko, ja };
+export const LANGUAGES = [
+  { code: 'zh', label: '中文', htmlLang: 'zh-CN' },
+  { code: 'en', label: 'English', htmlLang: 'en' },
+  { code: 'th', label: 'ไทย', htmlLang: 'th' },
+  { code: 'vi', label: 'Tiếng Việt', htmlLang: 'vi' },
+  { code: 'id', label: 'Indonesia', htmlLang: 'id' },
+  { code: 'de', label: 'Deutsch', htmlLang: 'de' },
+  { code: 'it', label: 'Italiano', htmlLang: 'it' },
+  { code: 'es', label: 'Español', htmlLang: 'es' },
+  { code: 'ko', label: '한국어', htmlLang: 'ko' },
+  { code: 'ja', label: '日本語', htmlLang: 'ja' },
+];
 const STORE_KEY = 'linepony.lang';
 const subscribers = new Set();
 
@@ -13,8 +33,8 @@ function detect() {
     const saved = localStorage.getItem(STORE_KEY);
     if (saved && DICTS[saved]) return saved;
   } catch { /* ignore */ }
-  const nav = (navigator.language || 'en').toLowerCase();
-  return nav.startsWith('zh') ? 'zh' : 'en';
+  const nav = (navigator.language || 'en').toLowerCase().split('-')[0];
+  return DICTS[nav] ? nav : 'en';
 }
 
 let lang = detect();
@@ -27,12 +47,13 @@ export function setLang(next) {
   if (!DICTS[next] || next === lang) return;
   lang = next;
   try { localStorage.setItem(STORE_KEY, next); } catch { /* ignore */ }
-  document.documentElement.lang = next === 'zh' ? 'zh-CN' : 'en';
+  document.documentElement.lang = LANGUAGES.find(({ code }) => code === next)?.htmlLang || 'en';
   subscribers.forEach((fn) => fn(lang));
 }
 
 export function toggleLang() {
-  setLang(lang === 'zh' ? 'en' : 'zh');
+  const index = LANGUAGES.findIndex(({ code }) => code === lang);
+  setLang(LANGUAGES[(index + 1) % LANGUAGES.length].code);
 }
 
 export function onLangChange(fn) {
@@ -51,4 +72,4 @@ export function t(key, params = {}) {
   return String(str).replace(/\{(\w+)\}/g, (_, k) => (p[k] != null ? p[k] : `{${k}}`));
 }
 
-document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+document.documentElement.lang = LANGUAGES.find(({ code }) => code === lang)?.htmlLang || 'en';

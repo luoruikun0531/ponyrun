@@ -47,7 +47,7 @@
 - **美术全部用 Gemini（Nano Banana Pro）在开发期预生成**，以用户概念图为风格参考；切帧打包为 sprite-sheet strip + `manifest.json`。**运行时纯播放本地资源，不调用任何 API。**
 - 角色动作走序列帧：`run` 两脚萌跑 ↔ `sprint` 四脚兽奔（吃到加速时切换，反差萌）；另有 `idle/trip/cry/taunt/hit`。
 - 音效 / BGM 用 **Web Audio 程序化合成**，零音频文件。
-- 中英双语 `src/i18n/`，浏览器语言自动识别，可一键切换。
+- 10 种语言 `src/i18n/`，浏览器语言自动识别，可随时切换。
 
 ```
 src/
@@ -55,7 +55,7 @@ src/
   render/     assets · Track · PonyActor · ItemMeteor · effects · RaceView
   audio/      sfx · bgm   (Web Audio, 程序化)
   ui/         screens · dom   (原生 DOM)
-  i18n/       zh · en
+  i18n/       zh · en · th · vi · id · de · it · es · ko · ja
 scripts/gen/  开发期美术流水线（Gemini 生成 + 抠图切帧打包）
 public/assets/ 预生成并打包的静态资源
 ```
