@@ -149,24 +149,24 @@ export class UI {
     // every pony owes 1 cup; the winner is exempt; items adjust the rest
     const drinksOf = (p) => (p === winner ? 0 : Math.max(1, p.penalty));
 
-    const loserCard = el('div', { class: 'loser-reveal' }, [
-      this.thumb(loser.colorKey, 'cry', 104),
-      el('div', { class: 'loser-text' }, [
-        el('div', { class: 'loser-label' }, '🍺 ' + t('result.loser')),
-        el('div', { class: 'loser-name' }, this._nameOf(loser)),
-        el('div', { class: 'loser-drink' }, t('result.drink', { n: drinksOf(loser) })),
+    // left card celebrates the one winner (proud / taunt pose)
+    const winnerCard = el('div', { class: 'winner-reveal' }, [
+      this.thumb(winner.colorKey, 'taunt', 104),
+      el('div', { class: 'winner-text' }, [
+        el('div', { class: 'winner-label' }, '👑 ' + t('result.winner')),
+        el('div', { class: 'winner-name' }, this._nameOf(winner)),
+        el('div', { class: 'winner-safe' }, t('result.nodrink')),
       ]),
     ]);
 
-    const cups = (p) => {
-      const d = drinksOf(p);
-      if (d === 0) return el('span', { class: 'rank-safe' }, '✅ ' + t('result.safe'));
-      return el('span', { class: 'rank-cups' }, `🍺 ×${d}`);
-    };
+    // everyone but the winner is a loser: crying thumb + their drink count
+    const cups = (p) => (p === winner
+      ? el('span', { class: 'rank-safe' }, '✅ ' + t('result.safe'))
+      : el('span', { class: 'rank-cups' }, `🍺 ×${drinksOf(p)}`));
     const rankList = el('div', { class: 'rank-list' },
       order.map((p, i) => el('div', { class: 'rank-row' + (p === loser ? ' is-loser' : '') + (p === winner ? ' is-winner' : '') }, [
         el('span', { class: 'rank-no' }, i === 0 ? '👑' : `${i + 1}`),
-        this.thumb(p.colorKey, i === 0 ? 'taunt' : 'idle', 44),
+        this.thumb(p.colorKey, p === winner ? 'taunt' : 'cry', 44),
         el('span', { class: 'rank-name' }, this._nameOf(p)),
         cups(p),
       ])));
@@ -177,7 +177,7 @@ export class UI {
     ]);
 
     this.layer.appendChild(el('div', { class: 'panel result-panel' }, [
-      el('div', { class: 'result-left' }, [loserCard]),
+      el('div', { class: 'result-left' }, [winnerCard]),
       el('div', { class: 'result-right' }, [
         el('div', { class: 'section-label' }, t('result.rankTitle')),
         rankList,

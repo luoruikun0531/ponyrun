@@ -23,6 +23,7 @@ export default {
     winner: 'Winner',
     loser: 'Loser',
     safe: 'Safe',
+    nodrink: 'No drinks 🍻',
     drink: '{n} drink{s}!',
     cheers: 'Cheers! 🍻',
     replay: 'Play again',

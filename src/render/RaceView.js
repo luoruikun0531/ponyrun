@@ -312,14 +312,13 @@ export class RaceView {
 
   _handleFinish() {
     this.finishHandled = true;
-    const { winner, loser } = this.race.results;
+    const { winner } = this.race.results;
     this.actors.forEach((a, i) => {
       const p = this.race.ponies[i];
       a.renderX = this.track.mapX(p.x); a.container.x = a.renderX;
       if (this.speedStops[i]) { this.speedStops[i](); this.speedStops[i] = null; }
-      if (p === winner) a.hold('taunt');
-      else if (p === loser) a.hold('cry');
-      else a.setBaseAnim('idle');
+      if (p === winner) a.hold('taunt'); // only the winner is proud
+      else a.hold('cry'); // everyone else loses and cries
     });
     const wa = this.actors[winner.index];
     const ph = this.track.ponyHeight();

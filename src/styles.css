@@ -92,11 +92,11 @@ html, body {
 .result-panel { display: flex; flex-direction: row; gap: 16px; align-items: center; max-width: min(96vw, 820px); }
 .result-left { flex: 0 0 auto; }
 .result-right { flex: 1 1 auto; display: flex; flex-direction: column; gap: 6px; min-width: 270px; }
-.loser-reveal { display: flex; flex-direction: column; align-items: center; gap: 3px; background: #fff0ee; border: 3px solid var(--ink); border-radius: 18px; padding: 8px 16px; }
-.loser-text { text-align: center; }
-.loser-label { font-size: 13px; font-weight: 800; color: #d8654f; }
-.loser-name { font-size: clamp(20px, 4.6vh, 30px); font-weight: 900; color: var(--ink); line-height: 1.1; }
-.loser-drink { font-size: clamp(15px, 3vh, 20px); font-weight: 900; color: #e0573e; }
+.winner-reveal { display: flex; flex-direction: column; align-items: center; gap: 3px; background: #eafae8; border: 3px solid #76c46a; border-radius: 18px; padding: 8px 16px; }
+.winner-text { text-align: center; }
+.winner-label { font-size: 13px; font-weight: 800; color: #4a9e44; }
+.winner-name { font-size: clamp(20px, 4.6vh, 30px); font-weight: 900; color: var(--ink); line-height: 1.1; }
+.winner-safe { font-size: clamp(15px, 3vh, 20px); font-weight: 900; color: #3e9e44; }
 .rank-list { display: flex; flex-direction: column; gap: 3px; width: 100%; }
 .rank-row { display: flex; align-items: center; gap: 10px; background: #fff; border: 2px solid #e6d8c0; border-radius: 12px; padding: 1px 12px; }
 .rank-row.is-loser { background: #ffe9e4; border-color: #e0573e; }
