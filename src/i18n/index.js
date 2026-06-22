@@ -29,6 +29,8 @@ const STORE_KEY = 'linepony.lang';
 const subscribers = new Set();
 
 function detect() {
+  const requested = new URLSearchParams(window.location.search).get('lang');
+  if (requested && DICTS[requested]) return requested;
   try {
     const saved = localStorage.getItem(STORE_KEY);
     if (saved && DICTS[saved]) return saved;
