@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { Race } from './race.js';
 import { makeRng, randomSeed } from './rng.js';
-import { shufflePoniesForLanes } from './lanes.js';
+import { laneOrderKey, shufflePoniesForLanes } from './lanes.js';
 import { rollItemType, ITEM_KEYS, ITEMS } from './items.js';
 import { TRACK_LEN } from './constants.js';
 
@@ -56,6 +56,16 @@ describe('lane assignment', () => {
     }
 
     expect(orders.size).toBeGreaterThan(1);
+  });
+
+  it('avoids repeating the previous lane order on replay', () => {
+    const ponies = mkPonies(4);
+    const previous = ponies.slice();
+    const noSwapRng = { int: (_lo, hi) => hi };
+    const replay = shufflePoniesForLanes(ponies, noSwapRng, laneOrderKey(previous));
+
+    expect(laneOrderKey(replay)).not.toBe(laneOrderKey(previous));
+    expect(replay.map((p) => p.id).sort()).toEqual(ponies.map((p) => p.id));
   });
 });
 

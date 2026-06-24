@@ -10,7 +10,7 @@ import { ItemMeteor } from './ItemMeteor.js';
 import { Effects } from './effects.js';
 import { Race } from '../logic/race.js';
 import { makeRng, randomSeed } from '../logic/rng.js';
-import { shufflePoniesForLanes } from '../logic/lanes.js';
+import { laneOrderKey, shufflePoniesForLanes } from '../logic/lanes.js';
 import { rollItemType, ITEMS } from '../logic/items.js';
 import { sfx } from '../audio/sfx.js';
 import { t } from '../i18n/index.js';
@@ -41,6 +41,7 @@ export class RaceView {
     this.speedStops = {};
     this.race = null;
     this.running = false;
+    this.lastLaneOrderKey = null;
     this.cam = { scale: 1, x: 0, y: 0 };
     this.cameraMode = 'wide';
     this._tick = (ticker) => this.update(ticker);
@@ -55,7 +56,8 @@ export class RaceView {
   setup(config) {
     this.config = config;
     const rng = makeRng(config.seed ?? randomSeed());
-    const lanePonies = shufflePoniesForLanes(config.ponies, rng);
+    const lanePonies = shufflePoniesForLanes(config.ponies, rng, this.lastLaneOrderKey);
+    this.lastLaneOrderKey = laneOrderKey(lanePonies);
     this.race = new Race({ rng, ponies: lanePonies, trackMul: config.trackMul ?? 1 });
     this.itemDensity = config.itemDensity ?? 1;
     this._wireEvents();
