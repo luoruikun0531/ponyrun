@@ -10,6 +10,7 @@ import { ItemMeteor } from './ItemMeteor.js';
 import { Effects } from './effects.js';
 import { Race } from '../logic/race.js';
 import { makeRng, randomSeed } from '../logic/rng.js';
+import { shufflePoniesForLanes } from '../logic/lanes.js';
 import { rollItemType, ITEMS } from '../logic/items.js';
 import { sfx } from '../audio/sfx.js';
 import { t } from '../i18n/index.js';
@@ -54,7 +55,8 @@ export class RaceView {
   setup(config) {
     this.config = config;
     const rng = makeRng(config.seed ?? randomSeed());
-    this.race = new Race({ rng, ponies: config.ponies, trackMul: config.trackMul ?? 1 });
+    const lanePonies = shufflePoniesForLanes(config.ponies, rng);
+    this.race = new Race({ rng, ponies: lanePonies, trackMul: config.trackMul ?? 1 });
     this.itemDensity = config.itemDensity ?? 1;
     this._wireEvents();
 
@@ -64,7 +66,7 @@ export class RaceView {
     this.meteors = [];
     this.speedStops = {};
 
-    this.actors = config.ponies.map((p, i) => {
+    this.actors = lanePonies.map((p, i) => {
       const anims = this.assets.ponyAnims[p.colorKey] || Object.values(this.assets.ponyAnims)[0];
       const actor = new PonyActor(anims, this.assets.cell, { name: p.name });
       actor.renderX = 0;

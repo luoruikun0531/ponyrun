@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { Race } from './race.js';
 import { makeRng, randomSeed } from './rng.js';
+import { shufflePoniesForLanes } from './lanes.js';
 import { rollItemType, ITEM_KEYS, ITEMS } from './items.js';
 import { TRACK_LEN } from './constants.js';
 
@@ -33,6 +34,28 @@ describe('rng', () => {
     const seqA = Array.from({ length: 5 }, () => a.next());
     const seqB = Array.from({ length: 5 }, () => b.next());
     expect(seqA).toEqual(seqB);
+  });
+});
+
+describe('lane assignment', () => {
+  it('shuffles pony lanes without changing the selected roster', () => {
+    const ponies = mkPonies(4);
+    const lanes = shufflePoniesForLanes(ponies, makeRng(7));
+
+    expect(lanes).not.toBe(ponies);
+    expect(lanes.map((p) => p.id).sort()).toEqual(ponies.map((p) => p.id));
+    expect(ponies.map((p) => p.id)).toEqual([0, 1, 2, 3]);
+  });
+
+  it('can assign different lanes for different race seeds', () => {
+    const ponies = mkPonies(4);
+    const orders = new Set();
+
+    for (let seed = 1; seed <= 12; seed++) {
+      orders.add(shufflePoniesForLanes(ponies, makeRng(seed)).map((p) => p.id).join(','));
+    }
+
+    expect(orders.size).toBeGreaterThan(1);
   });
 });
 
