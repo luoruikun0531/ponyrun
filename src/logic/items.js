@@ -1,10 +1,13 @@
 // Item registry — the whole item system as data (goal.md §5). Adding an item is
 // one self-contained entry here: rarity, spawn weight, fly time, icon, target
-// rule, and an effect() that calls Race primitives. Rarer ⇒ faster fly ⇒ harder
-// to tap ⇒ stronger effect. The render layer reads the metadata; the logic layer
-// runs effect(). The two never touch each other directly.
+// rule, and an effect() that calls Race primitives. All items cross the screen
+// vertically at the same speed; spawn weights keep common items more frequent
+// than missile/car. The render layer reads the metadata; the logic layer runs
+// effect(). The two never touch each other directly.
 
 import { TRACK_LEN } from './constants.js';
+
+const ITEM_FLY_TIME = 1.6;
 
 // Effect magnitudes, all in one place for tuning the 30% item layer.
 const M = {
@@ -17,39 +20,38 @@ const M = {
 };
 
 export const ITEMS = {
-  // ── Common: slow, easy to tap, mild ──────────────────────────────
+  // ── Common: more frequent, mild ──────────────────────────────────
   dash: {
-    rarity: 'common', weight: 26, flyTime: 2.5, icon: 'dash', target: 'lane',
+    rarity: 'common', weight: 26, flyTime: ITEM_FLY_TIME, icon: 'dash', target: 'lane', fly: 'vertical',
     effect: (race, t) => race.addImpulse(t.pony, M.dashBoost, M.dashDur, 'sprint'),
   },
   banana: {
-    rarity: 'common', weight: 24, flyTime: 2.6, icon: 'banana', target: 'lane',
+    rarity: 'common', weight: 24, flyTime: ITEM_FLY_TIME, icon: 'banana', target: 'lane', fly: 'vertical',
     effect: (race, t) => race.trip(t.pony, M.bananaTrip, M.bananaBack),
   },
   penaltyPlus: {
-    rarity: 'common', weight: 23, flyTime: 2.3, emoji: '🤡', badge: '+1', target: 'lane',
+    rarity: 'common', weight: 23, flyTime: ITEM_FLY_TIME, emoji: '🤡', badge: '+1', target: 'lane', fly: 'vertical',
     effect: (race, t) => race.addPenalty(t.pony, +1),
   },
   penaltyMinus: {
-    rarity: 'common', weight: 23, flyTime: 2.3, emoji: '🤡', badge: '-1', target: 'lane',
+    rarity: 'common', weight: 23, flyTime: ITEM_FLY_TIME, emoji: '🤡', badge: '-1', target: 'lane', fly: 'vertical',
     effect: (race, t) => race.addPenalty(t.pony, -1),
   },
 
-  // ── Rare: fall vertically across all lanes; tap over a lane to target
-  //    that lane's pony. Fast & hard to tap = explosive payoff. ──────
+  // ── Rare: less frequent, stronger payoff ─────────────────────────
   swap: {
     // TEMPORARILY DISABLED (weight 0 → never spawns): swapping with the leader
     // was too swingy. Restore a weight to bring it back.
-    rarity: 'rare', weight: 0, flyTime: 1.7, icon: 'swap', target: 'lane', fly: 'vertical',
+    rarity: 'rare', weight: 0, flyTime: ITEM_FLY_TIME, icon: 'swap', target: 'lane', fly: 'vertical',
     // swap the tapped pony's track position (x) with the current leader's
     effect: (race, t) => race.swapPositions(t.pony, race.leader()),
   },
   missile: {
-    rarity: 'rare', weight: 6, flyTime: 1.6, icon: 'missile', target: 'lane', fly: 'vertical',
+    rarity: 'rare', weight: 6, flyTime: ITEM_FLY_TIME, icon: 'missile', target: 'lane', fly: 'vertical',
     effect: (race, t) => race.knockback(t.pony, M.missileBack),
   },
   hitchhike: {
-    rarity: 'rare', weight: 6, flyTime: 1.6, icon: 'car', target: 'lane', fly: 'vertical',
+    rarity: 'rare', weight: 6, flyTime: ITEM_FLY_TIME, icon: 'car', target: 'lane', fly: 'vertical',
     effect: (race, t) => race.rideForward(t.pony, M.rideFwd),
   },
 };

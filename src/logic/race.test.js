@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { Race } from './race.js';
 import { makeRng, randomSeed } from './rng.js';
-import { rollItemType, ITEM_KEYS } from './items.js';
+import { rollItemType, ITEM_KEYS, ITEMS } from './items.js';
 import { TRACK_LEN } from './constants.js';
 
 function mkPonies(n) {
@@ -63,6 +63,26 @@ describe('Race basics', () => {
 });
 
 describe('item effects', () => {
+  it('keeps every item vertical and as fast as missile/car pickups', () => {
+    const flyTime = ITEMS.missile.flyTime;
+
+    for (const item of Object.values(ITEMS)) {
+      expect(item.fly).toBe('vertical');
+      expect(item.flyTime).toBe(flyTime);
+      expect(item.flyTime).toBe(ITEMS.hitchhike.flyTime);
+    }
+  });
+
+  it('keeps common item odds higher than missile/car odds', () => {
+    const rarePickupWeight = Math.max(ITEMS.missile.weight, ITEMS.hitchhike.weight);
+    const commonItems = Object.values(ITEMS).filter((item) => item.rarity === 'common');
+
+    expect(commonItems.length).toBeGreaterThan(0);
+    for (const item of commonItems) {
+      expect(item.weight).toBeGreaterThan(rarePickupWeight);
+    }
+  });
+
   it('dash pushes a pony ahead of where base speed alone would', () => {
     const race = new Race({ seed: 5, ponies: mkPonies(3) });
     for (let i = 0; i < 60; i++) race.step(1 / 60);

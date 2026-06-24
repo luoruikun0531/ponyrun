@@ -147,32 +147,21 @@ export class RaceView {
   _spawn() {
     const type = rollItemType(this.race.rng, this.race.leader().x);
     const def = ITEMS[type];
-    const n = this.actors.length;
     const ph = this.track.ponyHeight();
     const iconSize = ph * (def.rarity === 'rare' ? 0.92 : 0.78);
     // spawn inside the visible camera window so items are always reachable
     const vis = this._visibleWorld();
     const m = 70 / (this.cam.scale || 1);
 
-    let lane = (Math.random() * n) | 0;
-    let from; let to; let vertical = false;
-    if (def.fly === 'vertical') {
-      // falls across every lane; the target is whichever lane it's tapped over
-      vertical = true;
-      const x = vis.left + (vis.right - vis.left) * (0.18 + Math.random() * 0.64);
-      const topDown = Math.random() < 0.5;
-      from = { x, y: topDown ? vis.top - m : vis.bottom + m };
-      to = { x, y: topDown ? vis.bottom + m : vis.top - m };
-    } else {
-      // common items streak horizontally along a random lane, across the view
-      const y = this.track.laneGroundY(lane) - ph * 0.7;
-      const ltr = Math.random() < 0.5;
-      from = { x: ltr ? vis.left - m : vis.right + m, y };
-      to = { x: ltr ? vis.right + m : vis.left - m, y };
-    }
+    // Every item travels vertically across all lanes. Direction is random so
+    // top and bottom lanes get the same first-touch advantage over time.
+    const x = vis.left + (vis.right - vis.left) * (0.18 + Math.random() * 0.64);
+    const topDown = Math.random() < 0.5;
+    const from = { x, y: topDown ? vis.top - m : vis.bottom + m };
+    const to = { x, y: topDown ? vis.bottom + m : vis.top - m };
 
     const meteor = new ItemMeteor(this.app, this.assets, type, {
-      from, to, flyTime: def.flyTime, laneIndex: lane, iconSize, vertical,
+      from, to, flyTime: def.flyTime, laneIndex: null, iconSize, vertical: true,
       onCatch: (m) => this._onCatch(m),
       onMiss: () => {},
     });
@@ -181,11 +170,11 @@ export class RaceView {
   }
 
   _onCatch(meteor) {
-    const { x, y } = meteor.container;
+    const { x, y } = meteor.catchPoint ?? meteor.container;
     const rare = meteor.def.rarity === 'rare';
     if (rare) { sfx.catchRare(); this.effects.sparkle(x, y); }
     else { sfx.catchCommon(); this.effects.burst(x, y, { color: 0xfff0b0, count: 12, speed: 260 }); }
-    const laneIndex = meteor.vertical ? this.track.laneAtY(y) : meteor.laneIndex;
+    const laneIndex = this.track.laneAtY(y);
     if (meteor.type === 'missile') {
       meteor.dead = true; // remove the pickup; a homing rocket flies to the target
       this._launchMissile(x, y, laneIndex);

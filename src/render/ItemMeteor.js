@@ -1,6 +1,6 @@
-// A single item streaking across the track like a meteor (goal.md §5). Tap to
-// catch. Rarity (set in items.js) drives fly speed, size and how forgiving the
-// tap target is: rarer ⇒ faster ⇒ smaller hit area ⇒ harder ⇒ stronger payoff.
+// A single item crossing the track like a meteor (goal.md §5). Tap to catch.
+// Rarity (set in items.js) drives size and how forgiving the tap target is:
+// rarer ⇒ smaller hit area ⇒ harder ⇒ stronger payoff.
 
 import { Container, Sprite, Graphics, Text, Circle } from 'pixi.js';
 import { ITEMS } from '../logic/items.js';
@@ -22,6 +22,7 @@ export class ItemMeteor {
     this.t = 0;
     this.caught = false;
     this.dead = false;
+    this.catchPoint = null;
     const rare = this.def.rarity === 'rare';
 
     this.container = new Container();
@@ -54,17 +55,23 @@ export class ItemMeteor {
     this.container.eventMode = 'static';
     this.container.cursor = 'pointer';
     this.container.hitArea = new Circle(0, 0, hitR);
-    this.container.on('pointerdown', () => this._catch());
+    this.container.on('pointerdown', (event) => this._catch(event));
 
     this.rare = rare;
     this.iconSize = iconSize;
     this._wobble = Math.random() * Math.PI * 2;
   }
 
-  _catch() {
+  _catch(event) {
     if (this.caught || this.dead) return;
     this.caught = true;
     this.container.eventMode = 'none';
+    if (event?.global && this.container.parent) {
+      const p = this.container.parent.toLocal(event.global);
+      this.catchPoint = { x: p.x, y: p.y };
+    } else {
+      this.catchPoint = { x: this.container.x, y: this.container.y };
+    }
     if (this.onCatch) this.onCatch(this);
   }
 
