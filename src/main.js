@@ -2,6 +2,7 @@ import './styles.css';
 import { Application } from 'pixi.js';
 import { loadAssets } from './render/assets.js';
 import { Game } from './game.js';
+import { ANALYTICS_EVENTS, trackEvent } from './logic/analytics.js';
 import { t, onLangChange } from './i18n/index.js';
 
 function setLoading(show) {
@@ -54,6 +55,7 @@ async function boot() {
   requestAnimationFrame(fit);
   setTimeout(fit, 300);
   window.__game = game;
+  void trackEvent(ANALYTICS_EVENTS.gamePageView);
   onLangChange(() => { document.title = `${t('appTitle')} · PonyRun`; });
 }
 
